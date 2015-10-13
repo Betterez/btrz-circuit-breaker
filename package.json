@@ -1,6 +1,6 @@
 {
   "name": "btrz-circuit-breaker",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Circuit Breaker wrapper with native Promises",
   "main": "index.js",
   "scripts": {
@@ -22,9 +22,11 @@
   },
   "homepage": "https://github.com/Betterez/btrz-circuit-breaker",
   "dependencies": {
+    "circuit-breaker-js": "0.0.1"
   },
   "devDependencies": {
     "chai": "^3.0.0",
+    "chai-as-promised": "^5.1.0",
     "istanbul-harmony": "latest",
     "mocha": "latest",
     "chance": "0.7.1",
