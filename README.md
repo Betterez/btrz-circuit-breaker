@@ -17,7 +17,7 @@ io.js >= v2.0.1
     
     promise.then ...
 
-## Wrapping a request-like HTTP library
+## Wrapping a [request](https://github.com/request/request)-like HTTP library
 
     let configuration = { ... };
     let breaker = new CircuitBreaker(configuration);
