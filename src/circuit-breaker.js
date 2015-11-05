@@ -1,6 +1,25 @@
 "use strict";
 
+let _ = require("lodash");
 let CircuitBreaker = require("circuit-breaker-js");
+
+function initParams(uri, options, callback) {
+  if (typeof options === "function") {
+    callback = options;
+  }
+
+  let params = {};
+  if (typeof options === "object") {
+    _.assign(params, options, {uri: uri});
+  } else if (typeof uri === "string") {
+    _.assign(params, {uri: uri});
+  } else {
+    _.assign(params, uri);
+  }
+
+  params.callback = callback;
+  return params;
+}
 
 class BzCircuitBreaker {
 
@@ -36,7 +55,7 @@ class BzCircuitBreaker {
               resolve(JSON.parse(body));
             }
           };
-          let params = transport.initParams(uri, options, callback);
+          let params = initParams(uri, options, callback);
           params.method = method;
           return transport(params, params.callback);
       
