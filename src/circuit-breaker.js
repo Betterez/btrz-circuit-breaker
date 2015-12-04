@@ -1,7 +1,7 @@
 "use strict";
 
-let _ = require("lodash");
-let CircuitBreaker = require("circuit-breaker-js");
+let _ = require("lodash"),
+  CircuitBreaker = require("circuit-breaker-js");
 
 function initParams(uri, options, callback) {
   if (typeof options === "function") {
@@ -58,7 +58,7 @@ class BzCircuitBreaker {
           let params = initParams(uri, options, callback);
           params.method = method;
           return transport(params, params.callback);
-      
+
         },
         function () {
           //TODO: pass some data available to the fallback function
