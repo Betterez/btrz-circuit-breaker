@@ -20,7 +20,6 @@ describe("CircuitBreaker", function () {
   
     let makeFakeRequestLib = function (error, response, body) {
       response = response || {statusCode: 200};
-      body = JSON.stringify(body) || "{\"data\": 123}";
       let fakeRequestLib = function (params, callback) {
         setTimeout(function() { callback(error, response, body); }, 10);
       };
@@ -66,6 +65,24 @@ describe("CircuitBreaker", function () {
       };
 
       expect(promise).to.eventually.deep.equal({data: 123}).and.notify(asserts);
+    });
+
+    it("should not parse JSON response body", function (done) {
+      let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, null, "{\"data\": 123}");
+      let wrappedTransport = breaker.wrapHttpTransport(requestLib);
+      let promise = wrappedTransport("post", "http://test", {postData: "bodybody"});
+
+      expect(promise).to.eventually.deep.equal({data: 123}).and.notify(done);
+    });
+
+    it("should not parse if response body is not JSON", function (done) {
+      let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, null, "bodybody");
+      let wrappedTransport = breaker.wrapHttpTransport(requestLib);
+      let promise = wrappedTransport("post", "http://test", {postData: "bodybody"});
+
+      expect(promise).to.eventually.equal("bodybody").and.notify(done);
     });
 
     it("should wrap error http call transparently", function (done) {

@@ -52,7 +52,16 @@ class BzCircuitBreaker {
               reject(errorResponse);
             } else {
               success();
-              resolve(JSON.parse(body));
+              let parsedBody;
+              try {
+                parsedBody = JSON.parse(body);
+              }
+              catch (e) {
+                parsedBody = body;
+              }
+              finally {
+                resolve(parsedBody);
+              }
             }
           };
           let params = initParams(uri, options, callback);
