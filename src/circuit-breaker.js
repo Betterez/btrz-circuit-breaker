@@ -46,8 +46,21 @@ class BzCircuitBreaker {
               failed(error);
               reject(error);
             } else if (response.statusCode >= 400) {
-              //TODO: improve error thrown
-              let errorResponse = new Error (`${response.statusCode}: ${response.statusMessage}`);
+              let parsedBody = null;
+              let errorResponse = null;
+
+              if(body) {
+                try {
+                  parsedBody = JSON.parse(body);
+                  errorResponse = new Error (`${response.statusCode}: ${parsedBody.message}`);
+                  errorResponse.code = parsedBody.code;
+                } catch(err) {
+                  errorResponse = new Error (`${response.statusCode}: ${err.message}`);
+                }
+              } else {
+                errorResponse = new Error (`${response.statusCode}: ${response.statusMessage}`);
+              }
+
               failed(errorResponse);
               reject(errorResponse);
             } else {
