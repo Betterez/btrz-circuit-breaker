@@ -2,6 +2,10 @@
 
 Wrapper around [circuit-breaker-js](https://www.npmjs.com/package/circuit-breaker-js) to return native Promises.
 
+# Bump a new version
+
+`npm version patch`
+
 ## Engines
 
 io.js >= v2.0.1
