@@ -105,6 +105,71 @@ describe("CircuitBreaker", function () {
       expect(promise).to.eventually.be.rejectedWith("400: stahp").and.notify(done);
     });
 
+    it("should reject with the status code of the response when it fails", function () {
+      let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"}, JSON.stringify({
+        code: 'ERROR_CODE',
+        message: 'An Error message'
+      }));
+      let spy = sinon.spy(requestLib);
+      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      let promise = wrappedTransport("get", "http://test");
+
+      return promise
+        .catch((error) => {
+          expect(error.status).to.be.equal(500);
+        });
+    });
+
+    it("should reject with the code of the body when it fails", function () {
+      let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"}, JSON.stringify({
+        code: 'ERROR_CODE',
+        message: 'An Error message'
+      }));
+      let spy = sinon.spy(requestLib);
+      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      let promise = wrappedTransport("get", "http://test");
+
+      return promise
+        .catch((error) => {
+          expect(error.code).to.be.equal('ERROR_CODE');
+        });
+    });
+
+    it("should reject with the wright message when it fails and the body is parseable", function () {
+      let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"}, JSON.stringify({
+        code: 'ERROR_CODE',
+        message: 'An Error message'
+      }));
+      let spy = sinon.spy(requestLib);
+      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      let promise = wrappedTransport("get", "http://test");
+
+      return promise
+        .catch((error) => {
+          expect(error.message).to.be.equal('500: An Error message');
+        });
+    });
+
+    it("should reject with the wright message when it fails and the body is not parseable", function () {
+      let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"}, {
+        code: 'ERROR_CODE',
+        message: 'An Error message'
+      });
+
+      let spy = sinon.spy(requestLib);
+      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      let promise = wrappedTransport("get", "http://test");
+
+      return promise
+        .catch((error) => {
+          expect(error.message).to.be.equal('500: [object Object]');
+        });
+    });
+
     it("should wrap error http call, rejecting after several attempts", function (done) {
       let breaker = new CircuitBreaker();
       let requestLib = makeFakeRequestLib(new Error("anerror!"));

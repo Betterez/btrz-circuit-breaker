@@ -55,11 +55,13 @@ class BzCircuitBreaker {
                   errorResponse = new Error (`${response.statusCode}: ${parsedBody.message}`);
                   errorResponse.code = parsedBody.code;
                 } catch(err) {
-                  errorResponse = new Error (`${response.statusCode}: ${err.message}`);
+                  errorResponse = new Error (`${response.statusCode}: ${body}`);
                 }
               } else {
                 errorResponse = new Error (`${response.statusCode}: ${response.statusMessage}`);
               }
+
+              errorResponse.status = response.statusCode;
 
               failed(errorResponse);
               reject(errorResponse);
