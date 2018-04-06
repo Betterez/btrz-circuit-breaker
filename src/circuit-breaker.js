@@ -51,7 +51,7 @@ class BzCircuitBreaker {
 
               if(body) {
                 try {
-                  parsedBody = JSON.parse(body);
+                  parsedBody = body.toUpperCase ? JSON.parse(body) : body;
                   errorResponse = new Error (`${response.statusCode}: ${parsedBody.message}`);
                   errorResponse.code = parsedBody.code;
                 } catch(err) {

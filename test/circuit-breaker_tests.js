@@ -155,6 +155,21 @@ describe("CircuitBreaker", function () {
 
     it("should reject with the wright message when it fails and the body is not parseable", function () {
       let breaker = new CircuitBreaker();
+      let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"},
+        "non-parseable body");
+
+      let spy = sinon.spy(requestLib);
+      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      let promise = wrappedTransport("get", "http://test");
+
+      return promise
+          .catch((error) => {
+          expect(error.message).to.be.equal('500: non-parseable body');
+      });
+    });
+
+    it("should reject with the right message when it fails and the body was already parsed by some middleware", function () {
+      let breaker = new CircuitBreaker();
       let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"}, {
         code: 'ERROR_CODE',
         message: 'An Error message'
@@ -166,7 +181,8 @@ describe("CircuitBreaker", function () {
 
       return promise
         .catch((error) => {
-          expect(error.message).to.be.equal('500: [object Object]');
+          expect(error.message).to.be.equal('500: An Error message');
+          expect(error.code).to.be.equal('ERROR_CODE');
         });
     });
 
