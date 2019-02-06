@@ -4,9 +4,8 @@
   "description": "Circuit Breaker wrapper with native Promises",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test multi='xunit=test-results/xunit.xml spec=-' node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --ui bdd -R mocha-multi -t 5000",
+    "test": "NODE_ENV=test node_modules/mocha/bin/mocha --ui bdd -t 5000 --exit",
     "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w",
-    "publish": "publish",
     "preversion": "npm test",
     "postversion": "git push origin master && git push --tags"
   },
@@ -32,10 +31,7 @@
     "chai": "^3.0.0",
     "chai-as-promised": "^5.1.0",
     "chance": "0.7.1",
-    "istanbul": "^0.4.1",
     "mocha": "latest",
-    "mocha-multi": "latest",
-    "publish": "^0.5.0",
     "sinon": "latest"
   }
 }
