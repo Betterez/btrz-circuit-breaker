@@ -1,7 +1,6 @@
 "use strict";
 
-let _ = require("lodash"),
-  CircuitBreaker = require("circuit-breaker-js");
+const CircuitBreaker = require("circuit-breaker-js");
 
 function initParams(uri, options, callback) {
   if (typeof options === "function") {
@@ -10,11 +9,11 @@ function initParams(uri, options, callback) {
 
   let params = {};
   if (typeof options === "object") {
-    _.assign(params, options, {uri: uri});
+    params = Object.assign(params, options, {uri: uri});
   } else if (typeof uri === "string") {
-    _.assign(params, {uri: uri});
+    params = Object.assign(params, {uri: uri});
   } else {
-    _.assign(params, uri);
+    params = Object.assign(params, uri);
   }
 
   params.callback = callback;
