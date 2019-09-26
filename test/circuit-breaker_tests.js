@@ -137,7 +137,7 @@ describe("CircuitBreaker", function () {
         });
     });
 
-    it("should reject with the wright message when it fails and the body is parseable", function () {
+    it("should reject with the right message when it fails and the body is parseable", function () {
       let breaker = new CircuitBreaker();
       let requestLib = makeFakeRequestLib(null, {statusCode: 500, statusMessage: "error"}, JSON.stringify({
         code: 'ERROR_CODE',
@@ -237,7 +237,7 @@ describe("CircuitBreaker", function () {
 
     it("should wrap error code response http call, executing fallback after several attempts", function (done) {
       let breaker = new CircuitBreaker();
-      let requestLib = makeFakeRequestLib(null, {statusCode: 400, statusMessage: "stahp"});
+      let requestLib = makeFakeRequestLib(null, {statusCode: 501, statusMessage: "stahp"});
       let spy = sinon.spy(requestLib);
       let fallback = function () { return "this is the fallback"; };
       let wrappedTransport = breaker.wrapHttpTransport(spy, fallback);

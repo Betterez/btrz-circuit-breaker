@@ -1,6 +1,6 @@
 {
   "name": "btrz-circuit-breaker",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Circuit Breaker wrapper with native Promises",
   "main": "index.js",
   "scripts": {

@@ -63,7 +63,9 @@ class BzCircuitBreaker {
 
               errorResponse.status = response.statusCode;
 
-              failed(errorResponse);
+              if (response.statusCode > 500) {
+                failed(errorResponse);
+              }
               reject(errorResponse);
             } else {
               success();
@@ -82,11 +84,10 @@ class BzCircuitBreaker {
           let params = initParams(uri, options, callback);
           params.method = method;
           return transport(params, params.callback);
-
         },
         function () {
           //TODO: pass some data available to the fallback function
-          return (fallback && typeof(fallback) === "function") ? resolve(fallback()) : reject();
+          return (fallback && typeof(fallback) === "function") ? resolve(fallback()) : reject(new Error("CIRCUIT_BREAKER_TRIPPED_NO_FALLBACK"));
         });
 
       });
