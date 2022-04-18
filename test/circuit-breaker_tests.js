@@ -187,67 +187,89 @@ describe("CircuitBreaker", function () {
     });
 
     it("should wrap error http call, rejecting after several attempts", function (done) {
-      let breaker = new CircuitBreaker();
-      let requestLib = makeFakeRequestLib(new Error("anerror!"));
-      let spy = sinon.spy(requestLib);
-      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      const breaker = new CircuitBreaker();
+      const requestLib = makeFakeRequestLib(new Error("anerror!"));
+      const spy = sinon.spy(requestLib);
+      const wrappedTransport = breaker.wrapHttpTransport(spy);
 
       for (var i = 0; i < 10; i++) {
-        setTimeout(function() { wrappedTransport("get", "http://test"); }, i * 10);
+        setTimeout(function() { 
+          wrappedTransport("get", "http://test")
+            .catch(() => {
+            });
+        }, i * 10);
       }
 
       setTimeout(function() { 
-        let promise = wrappedTransport("get", "http://test");
-        expect(promise).to.be.rejected.and.notify(done);
+        wrappedTransport("get", "http://test")
+          .catch((e) => {
+            expect(e.message).to.be.eql("CIRCUIT_BREAKER_TRIPPED_NO_FALLBACK");
+            done();
+          });
       }, 120);
     });
 
     it("should wrap error http call, executing fallback after several attempts", function (done) {
-      let breaker = new CircuitBreaker();
-      let requestLib = makeFakeRequestLib(new Error("anerror!"));
-      let spy = sinon.spy(requestLib);
-      let fallback = function () { return "this is the fallback"; };
-      let wrappedTransport = breaker.wrapHttpTransport(spy, fallback);
+      const breaker = new CircuitBreaker();
+      const requestLib = makeFakeRequestLib(new Error("anerror!"));
+      const spy = sinon.spy(requestLib);
+      const fallback = function () { return "this is the fallback"; };
+      const wrappedTransport = breaker.wrapHttpTransport(spy, fallback);
 
       for (var i = 0; i < 10; i++) {
-        setTimeout(function() { wrappedTransport("get", "http://test"); }, i * 10);
+        setTimeout(function() { 
+          wrappedTransport("get", "http://test")
+            .catch(() => {
+            });          
+        }, i * 10);
       }
 
       setTimeout(function() { 
-        let promise = wrappedTransport("get", "http://test");
+        const promise = wrappedTransport("get", "http://test");
         expect(promise).to.eventually.equal("this is the fallback").and.notify(done);
       }, 120);
     });
 
     it("should wrap error code response http call, rejecting after several attempts", function (done) {
-      let breaker = new CircuitBreaker();
-      let requestLib = makeFakeRequestLib(null, {statusCode: 400, statusMessage: "stahp"});
-      let spy = sinon.spy(requestLib);
-      let wrappedTransport = breaker.wrapHttpTransport(spy);
+      const breaker = new CircuitBreaker();
+      const requestLib = makeFakeRequestLib(null, {statusCode: 400, statusMessage: "stahp"});
+      const spy = sinon.spy(requestLib);
+      const wrappedTransport = breaker.wrapHttpTransport(spy);
 
       for (var i = 0; i < 10; i++) {
-        setTimeout(function() { wrappedTransport("get", "http://test"); }, i * 10);
+        setTimeout(function() { 
+          wrappedTransport("get", "http://test")
+            .catch(() => {
+            });          
+        }, i * 10);
       }
 
       setTimeout(function() { 
-        let promise = wrappedTransport("get", "http://test");
-        expect(promise).to.be.rejected.and.notify(done);
+        wrappedTransport("get", "http://test")
+          .catch((e) => {
+            expect(e.message).to.be.eql("400: stahp");
+            done();
+          })        
       }, 120);
     });
 
     it("should wrap error code response http call, executing fallback after several attempts", function (done) {
-      let breaker = new CircuitBreaker();
-      let requestLib = makeFakeRequestLib(null, {statusCode: 501, statusMessage: "stahp"});
-      let spy = sinon.spy(requestLib);
-      let fallback = function () { return "this is the fallback"; };
-      let wrappedTransport = breaker.wrapHttpTransport(spy, fallback);
+      const breaker = new CircuitBreaker();
+      const requestLib = makeFakeRequestLib(null, {statusCode: 501, statusMessage: "stahp"});
+      const spy = sinon.spy(requestLib);
+      const fallback = function () { return "this is the fallback"; };
+      const wrappedTransport = breaker.wrapHttpTransport(spy, fallback);
 
       for (var i = 0; i < 10; i++) {
-        setTimeout(function() { wrappedTransport("get", "http://test"); }, i * 10);
+        setTimeout(function() { 
+          wrappedTransport("get", "http://test")
+            .catch(() => {
+            });                  
+        }, i * 10);
       }
 
       setTimeout(function() { 
-        let promise = wrappedTransport("get", "http://test");
+        const promise = wrappedTransport("get", "http://test");
         expect(promise).to.eventually.equal("this is the fallback").and.notify(done);
       }, 120);
     });
@@ -296,7 +318,10 @@ describe("CircuitBreaker", function () {
       let wrappedFn = breaker.wrapPromiseFunction(asyncFailingFunction);
 
       for (var i = 0; i < 10; i++) {
-        setTimeout(function() { wrappedFn("test"); }, i * 10);
+        setTimeout(function() { 
+          wrappedFn("test")
+          .catch((e) => {})
+        }, i * 10);
       }
 
       setTimeout(function() { 
@@ -311,7 +336,10 @@ describe("CircuitBreaker", function () {
       let wrappedFn = breaker.wrapPromiseFunction(asyncFailingFunction, fallback);
 
       for (var i = 0; i < 10; i++) {
-        setTimeout(function() { wrappedFn("test"); }, i * 10);
+        setTimeout(function() { 
+          wrappedFn("test")
+            .catch((e) => {});
+         }, i * 10);
       }
 
       setTimeout(function() {
